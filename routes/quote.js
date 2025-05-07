@@ -65,8 +65,7 @@ router.put("/:id", (req, resp) => {
             if(err)
                 return resp.send(apiError(err))
             if(result.affectedRows !== 1)
-                return resp.send(apiError("Requested Quote Record not Updated"))
-            
+                return resp.send(apiError("Requested Quote Record not Found"))            
             resp.send(apiSuccess({id: req.params.id, ...req.body}))
            
         }
