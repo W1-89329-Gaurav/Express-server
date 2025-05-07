@@ -27,7 +27,7 @@ router.get("/:id", (req, resp) => {
 
 router.post("", (req, resp) => {
     const {userId, author, contents, createdTime} = req.body
-    db.query("INSERT INTO quote(UserId, author, contents, createdTime) VALUES(?, ? , ? ,NOW())",
+    db.query("INSERT INTO quote(userId, author, contents, createdTime) VALUES(?, ? , ? ,NOW())",
         [userId, author, contents ,createdTime ], (err, result) => {
             if(err)
                 return resp.send(apiError(err))
@@ -57,6 +57,21 @@ router.delete("/:id", (req, resp) => {
     )
 })
 
+router.put("/:id", (req, resp) => {
+    const {userId, author, contents, createdTime} = req.body
+    db.query("UPDATE quote SET userId=?, author=?, contents=? ,createdTime=? WHERE id=?",
+        [userId, author, contents,createdTime, req.params.id],
+        (err, result) => {
+            if(err)
+                return resp.send(apiError(err))
+            if(result.affectedRows !== 1)
+                return resp.send(apiError("Requested Quote Record not Updated"))
+            
+            resp.send(apiSuccess({id: req.params.id, ...req.body}))
+           
+        }
+    )
+})
 
 
 module.exports = router
