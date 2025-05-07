@@ -5,6 +5,9 @@ const userRouter = require("./routes/user");
 const quoteRouter = require("./routes/quote");
 const { jwtAuth } = require("./utils/jwtauth");
 
+const cors = require("cors");
+app.use(cors());
+
 app.use(express.json());
 app.use(express.static("public"));
 //app.use(jwtAuth);
