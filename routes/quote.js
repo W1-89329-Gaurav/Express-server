@@ -72,5 +72,36 @@ router.put("/:id", (req, resp) => {
     )
 })
 
+router.get("/favQuote/:userId", (req, resp) => {
+    db.query("SELECT * FROM quote q Join favourite favq on favq.userId = q.userId WHERE q.userId=?", [req.params.userId],
+        (err, results) => {
+        if(err)
+            return resp.send(apiError(err))
+        if(results.length === 0)
+            return resp.send(apiError("No favourite Quotes Found"))
+          resp.send(apiSuccess(results))
+    })
+})
+
+
+router.post("/likeQuote/:userId", (req, resp) => {
+    const {userId, quoteId, createdTime} = req.body
+    db.query("INSERT INTO favourite(userId, quoteId, createdTime) VALUES(?, ?, NOW())",
+        [req.params.userId,quoteId,createdTime], (err, result) => {
+            if(err)
+                return resp.send(apiError(err))
+            if(result.affectedRows === 1) {
+                db.query("SELECT * FROM favourite WHERE id=?", [result.insertId],
+                    (err, results) => {
+                        if(err)
+                            return resp.send(apiError(err))
+                        resp.send(apiSuccess(results[0]))
+                    }
+                )
+            }
+        }
+    )
+})
+
 
 module.exports = router
