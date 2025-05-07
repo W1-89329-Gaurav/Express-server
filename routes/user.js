@@ -59,5 +59,18 @@ router.post("/signin", (req, resp) => {
     )
 })
 
+router.patch("/updateUser/:id", (req,resp) => {
+    const {firstName, lastName, email, phoneno, address} = req.body
+    db.query("UPDATE user SET firstName=?, lastName=? ,email=?, phoneno=?, address=?  WHERE id=?", [firstName, lastName, email, phoneno, address,req.params.id],
+        (err, result) => {
+            if(err)
+                return resp.send(apiError(err))
+            if(result.affectedRows !== 1)
+                return resp.send(apiError("User not found"))
+            resp.send(apiSuccess("User Profile updated"))
+        }
+    )
+})
+
 
 module.exports = router
