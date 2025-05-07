@@ -20,7 +20,7 @@ function verifyToken(token) {
 
 function jwtAuth(req, resp, next) {
 
-  const nonProtectedUrls = ["/users/signin", "/users/signup"];
+  const nonProtectedUrls = ["/user/signin", "/user/signup"];
   if (nonProtectedUrls.indexOf(req.url) >= 0) {
     next();
     return;

@@ -17,6 +17,7 @@ router.get("/:id", (req, resp) => {
     )
 })
 
+
 router.post("/signup", (req, resp) => {
     const {firstName, lastName, email,  password, phoneno, address} = req.body
     const encPasswd = bcrypt.hashSync(password, 10)
@@ -37,5 +38,26 @@ router.post("/signup", (req, resp) => {
         }
     )
 })
+
+// POST /user/signin
+router.post("/signin", (req, resp) => {
+    const {email, password} = req.body
+    db.query("SELECT * FROM user WHERE email=?", [email],
+        (err, results) => {
+            if(err)
+                return resp.send(apiError(err))
+            if(results.length !== 1) 
+                return resp.send(apiError("Invalid email"))
+            const dbUser = results[0]
+            const isMatching = bcrypt.compareSync(password, dbUser.password)
+            
+            if(!isMatching) 
+                return resp.send(apiError("Invalid password"))
+            const token = createToken(dbUser)
+            resp.send(apiSuccess({...dbUser, token})) 
+        }
+    )
+})
+
 
 module.exports = router
