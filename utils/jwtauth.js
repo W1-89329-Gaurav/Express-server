@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = "Sunbeam@DMCFeb2025"; 
 
 function createToken(user) {
-  const payload = { id: user.id, role: user.role };
+  const payload = { id: user.id };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
   return token;
 }
@@ -31,12 +31,11 @@ function jwtAuth(req, resp, next) {
 
   const [bearer, token] = req.headers.authorization.split(" ");
   const decoded = verifyToken(token);
-  console.log("incoming user token:", decoded);
-
+  //console.log("incoming user token:", decoded);
   if (!decoded) resp.status(403).send("Unauthoized Access - Invalid token");
   else {
     
-    req.user = { id: decoded.id, role: decoded.role };
+    req.user = { id: decoded.id };
     next();
   }
 }

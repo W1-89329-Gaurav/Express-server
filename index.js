@@ -10,7 +10,7 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.static("public"));
-//app.use(jwtAuth);
+app.use(jwtAuth);
 app.use("/user", userRouter);
 app.use("/quote", quoteRouter);
 

@@ -17,6 +17,13 @@ router.get("/:id", (req, resp) => {
     )
 })
 
+// et all users
+router.get("/", (req, resp) => {
+    db.query("SELECT * FROM user", (err, results) => {
+        if (err) return resp.send(apiError(err));
+        return resp.send(apiSuccess(results));
+    });
+});
 
 router.post("/signup", (req, resp) => {
     const {firstName, lastName, email,  password, phoneno, address} = req.body
@@ -59,18 +66,36 @@ router.post("/signin", (req, resp) => {
     )
 })
 
-router.patch("/:id", (req,resp) => {
-    const {firstName, lastName, email, phoneno, address} = req.body
-    db.query("UPDATE user SET firstName=?, lastName=? ,email=?, phoneno=?, address=?  WHERE id=?", [firstName, lastName, email, phoneno, address,req.params.id],
+router.patch("/:id", (req, resp) => {
+    const { firstName, lastName, email, phoneno, address } = req.body;
+    const userId = req.params.id;
+
+    db.query(
+        "UPDATE user SET firstName=?, lastName=?, email=?, phoneno=?, address=? WHERE id=?",
+        [firstName, lastName, email, phoneno, address, userId],
         (err, result) => {
-            if(err)
-                return resp.send(apiError(err))
-            if(result.affectedRows !== 1)
-                return resp.send(apiError("User not found"))
-            resp.send(apiSuccess("User Profile updated"))
+            if (err) return resp.send(apiError(err));
+            if (result.affectedRows !== 1) return resp.send(apiError("User not found"));
+            db.query("SELECT * FROM user WHERE id=?", [userId], (err2, results) => {
+                if (err2) return resp.send(apiError(err2));
+                if (results.length !== 1) return resp.send(apiError("User fetch failed after update"));
+
+                return resp.send(apiSuccess({
+                    message: "User profile updated successfully.",
+                    user: results[0]
+                }));
+            });
         }
-    )
-})
+    );
+});
 
 
+// Delete user by ID
+router.delete("/:id", (req, resp) => {
+    db.query("DELETE FROM user WHERE id = ?", [req.params.id], (err, result) => {
+        if (err) return resp.send(apiError(err));
+        if (result.affectedRows === 0) return resp.send(apiError("User not found"));
+        return resp.send(apiSuccess("User deleted successfully"));
+    });
+});
 module.exports = router
